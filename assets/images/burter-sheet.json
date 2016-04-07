@@ -1,0 +1,44 @@
+{"frames": {
+
+"burter-0.png":
+{
+	"frame": {"x":34,"y":1,"w":32,"h":37},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":37},
+	"sourceSize": {"w":32,"h":37}
+},
+"burter-1.png":
+{
+	"frame": {"x":68,"y":1,"w":40,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":32},
+	"sourceSize": {"w":40,"h":32}
+},
+"burter-2.png":
+{
+	"frame": {"x":110,"y":1,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+"burter-3.png":
+{
+	"frame": {"x":1,"y":1,"w":31,"h":39},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":31,"h":39},
+	"sourceSize": {"w":31,"h":39}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "burter-sheet.png",
+	"format": "RGBA8888",
+	"size": {"w":143,"h":41},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:f0b56fa87350fdade085d22f614820ad:e20304ea4d881985ae4708ef223766fc:24632011f70bc3d4c9a14a46c2303ad0$"
+}
+}

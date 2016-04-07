@@ -1,0 +1,44 @@
+{"frames": {
+
+"jeice-0.png":
+{
+	"frame": {"x":32,"y":1,"w":32,"h":39},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":39},
+	"sourceSize": {"w":32,"h":39}
+},
+"jeice-1.png":
+{
+	"frame": {"x":66,"y":1,"w":39,"h":38},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":39,"h":38},
+	"sourceSize": {"w":39,"h":38}
+},
+"jeice-2.png":
+{
+	"frame": {"x":107,"y":1,"w":32,"h":34},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":34},
+	"sourceSize": {"w":32,"h":34}
+},
+"jeice-3.png":
+{
+	"frame": {"x":1,"y":1,"w":29,"h":41},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":29,"h":41},
+	"sourceSize": {"w":29,"h":41}
+}},
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "jeice-sheet.png",
+	"format": "RGBA8888",
+	"size": {"w":140,"h":43},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:f36e6a44973eac1068e73d7689c994a5:9112686b0c74c05bd5d4c1a88c9c2415:41e5b9ea8175d1a321a98f7b63d6be25$"
+}
+}

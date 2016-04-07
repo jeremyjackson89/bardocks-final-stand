@@ -1,0 +1,105 @@
+{
+    "frames": {
+
+        "bardock-0.png": {
+            "frame": { "x": 165, "y": 1, "w": 31, "h": 44 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 44 },
+            "sourceSize": { "w": 31, "h": 44 }
+        },
+        "bardock-1.png": {
+            "frame": { "x": 33, "y": 1, "w": 30, "h": 46 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 46 },
+            "sourceSize": { "w": 30, "h": 46 }
+        },
+        "bardock-2.png": {
+            "frame": { "x": 298, "y": 1, "w": 32, "h": 41 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 41 },
+            "sourceSize": { "w": 32, "h": 41 }
+        },
+        "bardock-3.png": {
+            "frame": { "x": 198, "y": 1, "w": 28, "h": 43 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 28, "h": 43 },
+            "sourceSize": { "w": 28, "h": 43 }
+        },
+        "bardock-4.png": {
+            "frame": { "x": 260, "y": 1, "w": 36, "h": 41 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 36, "h": 41 },
+            "sourceSize": { "w": 36, "h": 41 }
+        },
+        "bardock-5.png": {
+            "frame": { "x": 365, "y": 1, "w": 40, "h": 38 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 40, "h": 38 },
+            "sourceSize": { "w": 40, "h": 38 }
+        },
+        "bardock-6.png": {
+            "frame": { "x": 97, "y": 1, "w": 32, "h": 44 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 44 },
+            "sourceSize": { "w": 32, "h": 44 }
+        },
+        "bardock-7.png": {
+            "frame": { "x": 131, "y": 1, "w": 32, "h": 44 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 44 },
+            "sourceSize": { "w": 32, "h": 44 }
+        },
+        "bardock-8.png": {
+            "frame": { "x": 332, "y": 1, "w": 31, "h": 41 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 31, "h": 41 },
+            "sourceSize": { "w": 31, "h": 41 }
+        },
+        "bardock-9.png": {
+            "frame": { "x": 407, "y": 1, "w": 32, "h": 34 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 32, "h": 34 },
+            "sourceSize": { "w": 32, "h": 34 }
+        },
+        "bardock-10.png": {
+            "frame": { "x": 228, "y": 1, "w": 30, "h": 42 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 42 },
+            "sourceSize": { "w": 30, "h": 42 }
+        },
+        "bardock-11.png": {
+            "frame": { "x": 65, "y": 1, "w": 30, "h": 46 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 46 },
+            "sourceSize": { "w": 30, "h": 46 }
+        },
+        "bardock-12.png": {
+            "frame": { "x": 1, "y": 1, "w": 30, "h": 48 },
+            "rotated": false,
+            "trimmed": false,
+            "spriteSourceSize": { "x": 0, "y": 0, "w": 30, "h": 48 },
+            "sourceSize": { "w": 30, "h": 48 }
+        }
+    },
+    "meta": {
+        "app": "http://www.codeandweb.com/texturepacker",
+        "version": "1.0",
+        "image": "bardock-sheet.png",
+        "format": "RGBA8888",
+        "size": { "w": 440, "h": 50 },
+        "scale": "1",
+        "smartupdate": "$TexturePacker:SmartUpdate:ea407f185f8c62c92e1bff251242b121:2043d996fe277a0650bf7b4153c3337b:270b81c008ae2eff06ee532b129b46b6$"
+    }
+}
