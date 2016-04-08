@@ -1,0 +1,8 @@
+{
+	"enemies": [{
+		"y": 100,
+		"speedX": -60,
+		"key": "guldo",
+		"scale": 1
+	}]
+}
