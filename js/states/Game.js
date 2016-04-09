@@ -143,12 +143,12 @@ GameObj.GameState = {
     },
     attack: function(player, enemy){
         if(this.playerAttacking){
+            enemy.customData.damaged = true;
             this.killEnemy(enemy);
-            enemy.enableBody = false;
-        } else if(!this.player.customData.damaged) {
-            this.player.play('damaged');
-            this.handlePlayerDamage();
-            this.player.customData.damaged = true;
+        } else if(!player.customData.damaged && !enemy.customData.damaged) {
+            player.play('damaged');
+            this.handlePlayerDamage(player);
+            player.customData.damaged = true;
         }
     },
     killEnemy: function(enemy) {
@@ -160,14 +160,19 @@ GameObj.GameState = {
         }, this);
         attackedTween.start();
     },
-    handlePlayerDamage: function(){
-        this.player.customData.health -= 25;
-        var attackedTween = this.game.add.tween(this.player);
+    handlePlayerDamage: function(player){
+        player.customData.health -= 25;
+        var attackedTween = this.game.add.tween(player);
         attackedTween.to({ tint: 0xFF0000 }, 100);
         attackedTween.onComplete.add(function() {
-            this.player.tint = 0xFFFFFF;
-            if(this.player.customData.health < 1){
-                this.player.kill();
+            player.tint = 0xFFFFFF;
+            if(player.customData.health < 1){
+                player.kill();
+            } else {
+                //let the player be immune temporarily
+                setTimeout(function(){
+                  player.customData.damaged = false;
+                }, 1000);
             }
         }, this);
         attackedTween.start();
