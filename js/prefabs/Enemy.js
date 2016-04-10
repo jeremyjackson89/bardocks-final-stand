@@ -15,9 +15,16 @@ GameObj.Enemy.prototype = Object.create(Phaser.Sprite.prototype);
 GameObj.Enemy.prototype.constructor = GameObj.Enemy;
 
 GameObj.Enemy.prototype.update = function() {
-	this.body.velocity.x = this.customData.speedX;
-    //kill if off world in the bottom
-    if (this.position.x < 1) {
-        this.kill();
+    this.body.velocity.x = this.customData.speedX;
+    //kill if off screen
+    if (this.position.x <= 0) {
+        this.destroy();
+        GameObj.GameState.deadEnemies += 1;
     }
+};
+
+GameObj.Enemy.prototype.reset = function(x, y, data) {
+    Phaser.Sprite.prototype.reset.call(this, x, y, data.type);
+    this.loadTexture(data.type);
+    this.customData = data;
 };

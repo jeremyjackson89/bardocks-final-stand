@@ -10,10 +10,18 @@ GameObj.PreloadState = {
 
     this.load.setPreloadSprite(this.preloadBar);
 
+    //load enemy data
+    this.load.text('enemyData', 'assets/data/enemyData.json');
+    this.load.text('levelData', 'assets/data/levelData.json');
+
     //load game assets
     this.load.image('space', 'assets/images/space.png');
+    this.load.image('bardockFace', 'assets/images/sprites/bardock-face.png');
+    this.load.image('dataPanel', 'assets/images/sprites/data-panel.png');
     this.load.image('energyBlast', 'assets/images/sprites/energy-blast.png');
     this.load.image('energyBomb', 'assets/images/sprites/energy-bomb.png');
+
+    //sprite sheets
     this.load.atlasJSONHash('player', 'assets/images/bardock-sheet.png', 'assets/images/bardock-sheet.json');
     this.load.atlasJSONHash('guldo', 'assets/images/guldo-sheet.png', 'assets/images/guldo-sheet.json');
     this.load.atlasJSONHash('recoome', 'assets/images/recoome-sheet.png', 'assets/images/recoome-sheet.json');
