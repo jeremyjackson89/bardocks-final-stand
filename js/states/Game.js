@@ -113,6 +113,7 @@ GameObj.GameState = {
     makeGUI: function() {
         //data panel GUI
         var style = { font: '8px PrStart', fill: '#fff' };
+        var levelStyle = { font: '12px PrStart', fill: '#fff' };
         this.dataPanel = this.add.sprite(0, 0, 'dataPanel');
         this.dataPanel.alpha = 0.6;
         this.playerFace = this.add.sprite(5, 5, 'bardockFace');
@@ -122,6 +123,7 @@ GameObj.GameState = {
         this.energyStats = this.add.text(110, 17, '', style);
         this.powerLevelLabel = this.add.text(50, 37, 'POWER LEVEL', style);
         this.powerLevelStats = this.add.text(50, 47, '', style);
+        this.levelLabel = this.add.text(this.game.world.centerX, this.game.world.centerY, '', levelStyle);
         this.refreshStats();
     },
     refreshStats: function() {
@@ -175,6 +177,7 @@ GameObj.GameState = {
     },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
+            enemy.frame = 3;
             enemy.customData.damaged = true;
             energyBlast.kill();
             this.killEnemy(enemy);
@@ -183,6 +186,7 @@ GameObj.GameState = {
     handleAttack: function(player, enemy) {
         if (this.playerAttacking && !enemy.customData.damaged) {
             enemy.customData.damaged = true;
+            enemy.frame = 2;
             this.killEnemy(enemy);
         } else if (!player.customData.damaged && !enemy.customData.damaged) {
             player.play('damaged');
@@ -204,16 +208,16 @@ GameObj.GameState = {
     increasePlayerStats: function(powerUp) {
         this.player.customData.powerLevel += powerUp;
         var milliLevel = Math.round(this.player.customData.powerLevel / 1000);
-        if (milliLevel % 7 == 0 && milliLevel != this.currentMilliLevel) {
+        if (milliLevel % 5 == 0 && milliLevel != this.currentMilliLevel) {
             this.currentMilliLevel = milliLevel;
-            this.player.customData.maxHealth += 2;
-            this.player.customData.health += Math.round(this.player.customData.maxHealth / 8);
-            this.player.customData.maxEnergy += 1;
-            this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 8);
+            this.player.customData.maxHealth += 5;
+            this.player.customData.health += Math.round(this.player.customData.maxHealth / 2);
+            this.player.customData.maxEnergy += 2;
+            this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 2);
         }
     },
     handlePlayerDamage: function(player) {
-        player.customData.health -= 10;
+        player.customData.health = (player.customData.health < 10) ? 0 : player.customData.health -= 10
         var attackedTween = this.game.add.tween(player);
         attackedTween.to({ tint: 0xFF0000 }, 100);
         attackedTween.onComplete.add(function() {
@@ -231,10 +235,18 @@ GameObj.GameState = {
         attackedTween.start();
     },
     loadLevelData: function() {
+        this.loadingNextLevel = false;
         console.log('current level:' + this.currentLevel);
         this.levelData = JSON.parse(this.game.cache.getText('levelData'));
         var currentLevelKey = 'level-' + this.currentLevel;
         this.currentLevelData = this.levelData[currentLevelKey];
+        this.levelLabel.text = 'LEVEL ' + this.currentLevel;
+        
+        var self = this;
+        setTimeout(function(){
+             self.levelLabel.text = '';
+        }, 1500);
+
         this.generateEnemies();
     },
     generateEnemies: function() {
@@ -285,9 +297,10 @@ GameObj.GameState = {
             if (this.currentLevel == this.TOTAL_LEVELS) {
                 alert('You won! :D');
                 this.game.state.start('Game', true, false, 1);
-            } else {
-                this.currentLevel += 1;
+            } else if(!this.loadingNextLevel) {
+                this.loadingNextLevel = true;
                 this.game.time.events.add(this.SECONDS_BETWEEN_LEVELS, function() {
+                    this.currentLevel += 1;
                     this.loadLevelData();
                 }, this);
             }
