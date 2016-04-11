@@ -211,9 +211,9 @@ GameObj.GameState = {
         if (milliLevel % 5 == 0 && milliLevel != this.currentMilliLevel) {
             this.currentMilliLevel = milliLevel;
             this.player.customData.maxHealth += 5;
-            this.player.customData.health += Math.round(this.player.customData.maxHealth / 2);
-            this.player.customData.maxEnergy += 2;
-            this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 2);
+            this.player.customData.health += Math.round(this.player.customData.maxHealth / 4);
+            this.player.customData.maxEnergy += 3;
+            this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 4);
         }
     },
     handlePlayerDamage: function(player) {
@@ -270,7 +270,7 @@ GameObj.GameState = {
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
-                powerUp: this.getRandomInt(75, 100)
+                powerUp: this.getRandomInt(100, 300)
             });
         }
 
