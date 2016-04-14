@@ -3,10 +3,12 @@ var GameObj = GameObj || {};
 GameObj.GameState = {
     init: function(currentLevel) {
         //constants
-        this.PLAYER_SPEED = 150;
+        this.PLAYER_SPEED = 160;
         this.ENERGY_BLAST_SPEED = 350;
         this.KEY_DOWN_DURATION = 250;
-        this.MIN_Y = 80;
+        this.MIN_Y = 90;
+        this.PLAYER_STARTING_POINT = 45;
+        this.MAX_PLAYER_X = (this.game.world.width/3 > 120) ? this.game.world.width/3 : 120;
         this.SECONDS_BETWEEN_LEVELS = 5;
 
         //keyboard cursors
@@ -42,11 +44,13 @@ GameObj.GameState = {
     },
     update: function() {
         this.player.body.velocity.y = 0;
+        this.player.body.velocity.x = 0;
 
         //collision detections
         this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
         this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
 
+        //attacks
         if (this.elbowKey && this.elbowKey.downDuration(this.KEY_DOWN_DURATION)) {
             this.player.play('elbow');
             this.playerAttacking = true;
@@ -59,12 +63,24 @@ GameObj.GameState = {
             this.player.play('blast');
             this.blastFired = true;
         }
+        
+        //movement
         if (this.cursors.up.isDown && this.player.body.position.y > this.MIN_Y) {
             this.player.body.velocity.y = -this.PLAYER_SPEED;
         }
         if (this.cursors.down.isDown) {
             this.player.body.velocity.y = this.PLAYER_SPEED;
         }
+        if (this.cursors.left.isDown && !this.cursors.right.isDown) {
+            if(!this.playerAttacking && !this.blastFired){
+                this.player.play('backward');
+            }
+            this.player.body.velocity.x = -this.PLAYER_SPEED;
+        }
+        if (this.cursors.right.isDown && this.player.body.position.x < this.MAX_PLAYER_X) {
+            this.player.body.velocity.x = this.PLAYER_SPEED;
+        }
+
         this.refreshStats();
         this.setAnimationToDefault();
         this.checkRemainingEnemyCount();
@@ -87,9 +103,10 @@ GameObj.GameState = {
         }
     },
     setPlayerData: function() {
-        this.player = this.add.sprite(45, this.game.world.centerY, 'player');
+        this.player = this.add.sprite(this.PLAYER_STARTING_POINT, this.game.world.centerY, 'player');
         this.player.anchor.setTo(0.5);
         this.player.animations.add('forward', [2], 7, false);
+        this.player.animations.add('backward', [3], 7, false);
         this.player.animations.add('elbow', [4], 7, false);
         this.player.animations.add('kick', [5], 7, false);
         this.player.animations.add('blast', [6, 7], 13, false);
@@ -103,6 +120,7 @@ GameObj.GameState = {
             energy: 10,
             maxEnergy: 10,
             powerLevel: 10000,
+            enemiesDefeated: 0,
             damaged: false
         };
 
@@ -117,19 +135,27 @@ GameObj.GameState = {
         this.dataPanel = this.add.sprite(0, 0, 'dataPanel');
         this.dataPanel.alpha = 0.6;
         this.playerFace = this.add.sprite(5, 5, 'bardockFace');
+        
         this.healthLabel = this.add.text(50, 7, 'HEALTH:', style);
         this.healthStats = this.add.text(110, 7, '', style);
+        
         this.energyLabel = this.add.text(50, 17, 'ENERGY:', style);
         this.energyStats = this.add.text(110, 17, '', style);
+        
         this.powerLevelLabel = this.add.text(50, 37, 'POWER LEVEL', style);
         this.powerLevelStats = this.add.text(50, 47, '', style);
-        this.levelLabel = this.add.text(this.game.world.centerX, this.game.world.centerY, '', levelStyle);
+        
+        this.defeatedLabel = this.add.text(5, 67, 'ENEMIES DEFEATED', style);
+        this.defeatedStats = this.add.text(5, 77, '', style);
+
+        this.levelLabel = this.add.text(this.game.world.centerX - 10, this.game.world.centerY, '', levelStyle);
         this.refreshStats();
     },
     refreshStats: function() {
-        this.healthStats.text = this.player.customData.health;
-        this.energyStats.text = this.player.customData.energy;
+        this.healthStats.text = this.player.customData.health + '/' + this.player.customData.maxHealth;
+        this.energyStats.text = this.player.customData.energy + '/' + this.player.customData.maxEnergy;
         this.powerLevelStats.text = this.formatNumber(this.player.customData.powerLevel);
+        this.defeatedStats.text = this.formatNumber(this.player.customData.enemiesDefeated);
     },
     formatNumber: function(number) {
         return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -207,12 +233,30 @@ GameObj.GameState = {
     },
     increasePlayerStats: function(powerUp) {
         this.player.customData.powerLevel += powerUp;
+        this.player.customData.enemiesDefeated += 1;
+
+        var healthIncrease = 5;
+        var energyIncrease = 3;
+
         var milliLevel = Math.round(this.player.customData.powerLevel / 1000);
-        if (milliLevel % 5 == 0 && milliLevel != this.currentMilliLevel) {
+        if (milliLevel % 7 == 0 && milliLevel != this.currentMilliLevel) {
+            //keep track of the current milliLevel
             this.currentMilliLevel = milliLevel;
-            this.player.customData.maxHealth += 5;
-            this.player.customData.health += Math.round(this.player.customData.maxHealth / 4);
-            this.player.customData.maxEnergy += 3;
+            
+            //increase and restore some health
+            this.player.customData.maxHealth += healthIncrease;
+            var currentHealthDifference = this.player.customData.maxHealth - this.player.customData.health;
+            var maxHealthRestore = Math.round(this.player.customData.maxHealth / 4);
+            var amountOfHealthToRestore = maxHealthRestore;
+
+            if((maxHealthRestore + this.player.customData.health) > this.player.customData.maxHealth){
+                amountOfHealthToRestore = currentHealthDifference;
+            }
+            this.player.customData.health += amountOfHealthToRestore;
+            
+            //increase and restore some energy
+            this.player.customData.maxEnergy += energyIncrease;
+            var currentEnergyDifference = this.player.customData.maxEnergy - this.player.customData.energy;
             this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 4);
         }
     },
@@ -241,10 +285,10 @@ GameObj.GameState = {
         var currentLevelKey = 'level-' + this.currentLevel;
         this.currentLevelData = this.levelData[currentLevelKey];
         this.levelLabel.text = 'LEVEL ' + this.currentLevel;
-        
+
         var self = this;
-        setTimeout(function(){
-             self.levelLabel.text = '';
+        setTimeout(function() {
+            self.levelLabel.text = '';
         }, 1500);
 
         this.generateEnemies();
@@ -297,7 +341,7 @@ GameObj.GameState = {
             if (this.currentLevel == this.TOTAL_LEVELS) {
                 alert('You won! :D');
                 this.game.state.start('Game', true, false, 1);
-            } else if(!this.loadingNextLevel) {
+            } else if (!this.loadingNextLevel) {
                 this.loadingNextLevel = true;
                 this.game.time.events.add(this.SECONDS_BETWEEN_LEVELS, function() {
                     this.currentLevel += 1;

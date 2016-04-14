@@ -17,7 +17,7 @@ GameObj.PreloadState = {
     //load game assets
     this.load.image('space', 'assets/images/space.png');
     this.load.image('bardockFace', 'assets/images/sprites/bardock-face.png');
-    this.load.image('dataPanel', 'assets/images/sprites/data-panel.png');
+    this.load.image('dataPanel', 'assets/images/sprites/data-panel-2.png');
     this.load.image('energyBlast', 'assets/images/sprites/energy-blast.png');
     this.load.image('energyBomb', 'assets/images/sprites/energy-bomb.png');
 
