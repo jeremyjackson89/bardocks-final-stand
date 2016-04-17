@@ -31,6 +31,6 @@ GameObj.PreloadState = {
     this.load.atlasJSONHash('freeza', 'assets/images/freeza-sheet.png', 'assets/images/freeza-sheet.json');
   },
   create: function() {
-    this.state.start('Game');
+    this.state.start('Home');
   }
 };

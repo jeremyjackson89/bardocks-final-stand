@@ -6,9 +6,9 @@ GameObj.GameState = {
         this.PLAYER_SPEED = 160;
         this.ENERGY_BLAST_SPEED = 350;
         this.KEY_DOWN_DURATION = 250;
-        this.MIN_Y = 90;
+        this.MIN_Y = 110;
         this.PLAYER_STARTING_POINT = 45;
-        this.MAX_PLAYER_X = (this.game.world.width/3 > 120) ? this.game.world.width/3 : 120;
+        this.MAX_PLAYER_X = (this.game.world.width / 3 > 120) ? this.game.world.width / 3 : 120;
         this.SECONDS_BETWEEN_LEVELS = 5;
 
         //keyboard cursors
@@ -24,7 +24,6 @@ GameObj.GameState = {
         this.currentLevel = currentLevel ? currentLevel : 1;
     },
     create: function() {
-        this.enemyData = JSON.parse(this.game.cache.getText('enemyData'));
         //background
         this.background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
         this.background.autoScroll(-130, 0);
@@ -63,7 +62,7 @@ GameObj.GameState = {
             this.player.play('blast');
             this.blastFired = true;
         }
-        
+
         //movement
         if (this.cursors.up.isDown && this.player.body.position.y > this.MIN_Y) {
             this.player.body.velocity.y = -this.PLAYER_SPEED;
@@ -72,7 +71,7 @@ GameObj.GameState = {
             this.player.body.velocity.y = this.PLAYER_SPEED;
         }
         if (this.cursors.left.isDown && !this.cursors.right.isDown) {
-            if(!this.playerAttacking && !this.blastFired){
+            if (!this.playerAttacking && !this.blastFired) {
                 this.player.play('backward');
             }
             this.player.body.velocity.x = -this.PLAYER_SPEED;
@@ -135,16 +134,16 @@ GameObj.GameState = {
         this.dataPanel = this.add.sprite(0, 0, 'dataPanel');
         this.dataPanel.alpha = 0.6;
         this.playerFace = this.add.sprite(5, 5, 'bardockFace');
-        
+
         this.healthLabel = this.add.text(50, 7, 'HEALTH:', style);
         this.healthStats = this.add.text(110, 7, '', style);
-        
+
         this.energyLabel = this.add.text(50, 17, 'ENERGY:', style);
         this.energyStats = this.add.text(110, 17, '', style);
-        
+
         this.powerLevelLabel = this.add.text(50, 37, 'POWER LEVEL', style);
         this.powerLevelStats = this.add.text(50, 47, '', style);
-        
+
         this.defeatedLabel = this.add.text(5, 67, 'ENEMIES DEFEATED', style);
         this.defeatedStats = this.add.text(5, 77, '', style);
 
@@ -170,7 +169,7 @@ GameObj.GameState = {
     },
     restoreEnegry: function() {
         if (this.player.customData.energy < this.player.customData.maxEnergy) {
-            var maxToRestore = 2;
+            var maxToRestore = Math.round(this.player.customData.maxEnergy / 10);
             var currentDifference = this.player.customData.maxEnergy - this.player.customData.energy;
             var amountToRestore = (currentDifference == 1) ? 1 : maxToRestore;
             this.player.customData.energy += amountToRestore;
@@ -210,11 +209,12 @@ GameObj.GameState = {
         }
     },
     handleAttack: function(player, enemy) {
+        var enemyCanDamage = enemy.position.x >= player.position.x;
         if (this.playerAttacking && !enemy.customData.damaged) {
             enemy.customData.damaged = true;
             enemy.frame = 2;
             this.killEnemy(enemy);
-        } else if (!player.customData.damaged && !enemy.customData.damaged) {
+        } else if (enemyCanDamage && !player.customData.damaged && !enemy.customData.damaged) {
             player.play('damaged');
             this.handlePlayerDamage(player);
             player.customData.damaged = true;
@@ -235,33 +235,39 @@ GameObj.GameState = {
         this.player.customData.powerLevel += powerUp;
         this.player.customData.enemiesDefeated += 1;
 
-        var healthIncrease = 5;
-        var energyIncrease = 3;
+        var healthIncrease = 1;
+        var energyIncrease = 2;
 
         var milliLevel = Math.round(this.player.customData.powerLevel / 1000);
-        if (milliLevel % 7 == 0 && milliLevel != this.currentMilliLevel) {
+        if (milliLevel % 9 == 0 && milliLevel != this.currentMilliLevel) {
+
             //keep track of the current milliLevel
             this.currentMilliLevel = milliLevel;
-            
+
             //increase and restore some health
             this.player.customData.maxHealth += healthIncrease;
             var currentHealthDifference = this.player.customData.maxHealth - this.player.customData.health;
             var maxHealthRestore = Math.round(this.player.customData.maxHealth / 4);
             var amountOfHealthToRestore = maxHealthRestore;
-
-            if((maxHealthRestore + this.player.customData.health) > this.player.customData.maxHealth){
+            if ((maxHealthRestore + this.player.customData.health) > this.player.customData.maxHealth) {
                 amountOfHealthToRestore = currentHealthDifference;
             }
             this.player.customData.health += amountOfHealthToRestore;
-            
+
             //increase and restore some energy
             this.player.customData.maxEnergy += energyIncrease;
             var currentEnergyDifference = this.player.customData.maxEnergy - this.player.customData.energy;
-            this.player.customData.energy += Math.round(this.player.customData.maxEnergy / 4);
+            var maxEnergyRestore = Math.round(this.player.customData.maxEnergy / 4);
+            var amountOfEnergyToRestore = maxEnergyRestore;
+            if ((maxEnergyRestore + this.player.customData.energy) > this.player.customData.maxEnergy) {
+                amountOfEnergyToRestore = currentEnergyDifference;
+            }
+            this.player.customData.Energy += amountOfEnergyToRestore;
         }
     },
     handlePlayerDamage: function(player) {
-        player.customData.health = (player.customData.health < 10) ? 0 : player.customData.health -= 10
+        var damage = 5;
+        player.customData.health = (player.customData.health < damage) ? 0 : player.customData.health -= damage
         var attackedTween = this.game.add.tween(player);
         attackedTween.to({ tint: 0xFF0000 }, 100);
         attackedTween.onComplete.add(function() {
@@ -280,20 +286,20 @@ GameObj.GameState = {
     },
     loadLevelData: function() {
         this.loadingNextLevel = false;
-        console.log('current level:' + this.currentLevel);
         this.levelData = JSON.parse(this.game.cache.getText('levelData'));
+
         var currentLevelKey = 'level-' + this.currentLevel;
         this.currentLevelData = this.levelData[currentLevelKey];
-        this.levelLabel.text = 'LEVEL ' + this.currentLevel;
+        this.levelLabel.text = 'WAVE ' + this.currentLevel;
 
         var self = this;
         setTimeout(function() {
             self.levelLabel.text = '';
         }, 1500);
 
-        this.generateEnemies();
+        this.generateEnemyData();
     },
-    generateEnemies: function() {
+    generateEnemyData: function() {
         var startingX = 10;
         var allowedTypes = this.currentLevelData.enemies;
         var maxIndex = allowedTypes.length - 1;
@@ -314,7 +320,7 @@ GameObj.GameState = {
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
-                powerUp: this.getRandomInt(100, 300)
+                powerUp: this.getRandomInt(300, 700)
             });
         }
 
@@ -325,7 +331,7 @@ GameObj.GameState = {
     scheduleNextEnemy: function() {
         var nextEnemy = this.currentLevelData.enemies[this.currentEnemyIndex];
         if (nextEnemy) {
-            var nextTime = 1000 * (nextEnemy.time - (this.currentEnemyIndex == 0 ? 0 : this.enemyData.enemies[this.currentEnemyIndex - 1].time));
+            var nextTime = 1000 * (nextEnemy.time - (this.currentEnemyIndex == 0 ? 0 : this.currentLevelData.enemies[this.currentEnemyIndex - 1].time));
             this.nextEnemyTimer = this.game.time.events.add(nextTime, function() {
                 this.currentEnemyIndex++;
                 this.createEnemy(nextEnemy);
@@ -351,7 +357,10 @@ GameObj.GameState = {
         }
     },
     handleGameOver: function() {
-        alert('You died! :(');
-        this.game.state.start('Game', true, false, 1);
+        var self = this;
+        var waitTime = 1000;
+        setTimeout(function() {
+            self.game.state.start('GameOver', true, false, self.player.customData);
+        }, waitTime);
     }
 };
