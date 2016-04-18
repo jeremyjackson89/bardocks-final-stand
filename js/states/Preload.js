@@ -28,7 +28,7 @@ GameObj.PreloadState = {
     this.load.atlasJSONHash('jeice', 'assets/images/jeice-sheet.png', 'assets/images/jeice-sheet.json');
     this.load.atlasJSONHash('burter', 'assets/images/burter-sheet.png', 'assets/images/burter-sheet.json');
     this.load.atlasJSONHash('ginyu', 'assets/images/ginyu-sheet.png', 'assets/images/ginyu-sheet.json');
-    this.load.atlasJSONHash('freeza', 'assets/images/freeza-sheet.png', 'assets/images/freeza-sheet.json');
+    this.load.atlasJSONHash('freeza', 'assets/images/freeza-sheet-2.png', 'assets/images/freeza-sheet-2.json');
   },
   create: function() {
     this.state.start('Home');

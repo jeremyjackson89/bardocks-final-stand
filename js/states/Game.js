@@ -21,7 +21,10 @@ GameObj.GameState = {
 
         //level data
         this.TOTAL_LEVELS = 5;
-        this.currentLevel = currentLevel ? currentLevel : 1;
+        this.currentLevel = currentLevel ? currentLevel : 5;
+        this.inputDisabled = false;
+        this.playerWon = false;
+        this.gameHasEnded = false;
     },
     create: function() {
         //background
@@ -42,47 +45,76 @@ GameObj.GameState = {
         this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.restoreEnegry, this);
     },
     update: function() {
-        this.player.body.velocity.y = 0;
-        this.player.body.velocity.x = 0;
+        if (!this.inputDisabled) {
+            this.player.body.velocity.y = 0;
+            this.player.body.velocity.x = 0;
 
-        //collision detections
-        this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
-        this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
+            //collision detections
+            this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
+            this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
 
-        //attacks
-        if (this.elbowKey && this.elbowKey.downDuration(this.KEY_DOWN_DURATION)) {
-            this.player.play('elbow');
-            this.playerAttacking = true;
-        }
-        if (this.kickKey && this.kickKey.downDuration(this.KEY_DOWN_DURATION)) {
-            this.player.play('kick');
-            this.playerAttacking = true;
-        }
-        if (this.energyKey.isDown && this.player.customData.energy > 0) {
-            this.player.play('blast');
-            this.blastFired = true;
-        }
-
-        //movement
-        if (this.cursors.up.isDown && this.player.body.position.y > this.MIN_Y) {
-            this.player.body.velocity.y = -this.PLAYER_SPEED;
-        }
-        if (this.cursors.down.isDown) {
-            this.player.body.velocity.y = this.PLAYER_SPEED;
-        }
-        if (this.cursors.left.isDown && !this.cursors.right.isDown) {
-            if (!this.playerAttacking && !this.blastFired) {
-                this.player.play('backward');
+            //attacks
+            if (this.elbowKey && this.elbowKey.downDuration(this.KEY_DOWN_DURATION)) {
+                this.player.play('elbow');
+                this.playerAttacking = true;
             }
-            this.player.body.velocity.x = -this.PLAYER_SPEED;
-        }
-        if (this.cursors.right.isDown && this.player.body.position.x < this.MAX_PLAYER_X) {
-            this.player.body.velocity.x = this.PLAYER_SPEED;
+            if (this.kickKey && this.kickKey.downDuration(this.KEY_DOWN_DURATION)) {
+                this.player.play('kick');
+                this.playerAttacking = true;
+            }
+            if (this.energyKey.isDown && this.player.customData.energy > 0) {
+                this.player.play('blast');
+                this.blastFired = true;
+            }
+
+            //movement
+            if (this.cursors.up.isDown && this.player.body.position.y > this.MIN_Y) {
+                this.player.body.velocity.y = -this.PLAYER_SPEED;
+            }
+            if (this.cursors.down.isDown) {
+                this.player.body.velocity.y = this.PLAYER_SPEED;
+            }
+            if (this.cursors.left.isDown && !this.cursors.right.isDown) {
+                if (!this.playerAttacking && !this.blastFired) {
+                    this.player.play('backward');
+                }
+                this.player.body.velocity.x = -this.PLAYER_SPEED;
+            }
+            if (this.cursors.right.isDown && this.player.body.position.x < this.MAX_PLAYER_X) {
+                this.player.body.velocity.x = this.PLAYER_SPEED;
+            }
+
+            this.refreshStats();
+            this.setAnimationToDefault();
+            this.checkRemainingEnemyCount();
         }
 
-        this.refreshStats();
-        this.setAnimationToDefault();
-        this.checkRemainingEnemyCount();
+        if (this.freeza) {
+            //add collision detection for blast
+            this.game.physics.arcade.overlap(this.freeza, this.energyBlasts, this.blastFreeza, null, this);
+            if (!this.freeza.customData.isInPosition) {
+                this.checkFreezaPosition();
+            }
+
+            if (this.energyBomb) {
+                this.energyBomb.angle -= 0.5;
+            }
+        }
+
+        if (this.gameHasEnded) {
+            var self = this;
+            this.game.input.keyboard.onDownCallback = function(e) {
+                restartGame();
+            }
+            if (this.game.input.activePointer.isDown) {
+                restartGame();
+            }
+
+            function restartGame(){
+                self.game.input.keyboard.onDownCallback = null;
+                self.state.start('Home');
+            }
+        }
     },
     setAnimationToDefault: function() {
         if (!this.player.animations.currentAnim.isPlaying) {
@@ -104,12 +136,15 @@ GameObj.GameState = {
     setPlayerData: function() {
         this.player = this.add.sprite(this.PLAYER_STARTING_POINT, this.game.world.centerY, 'player');
         this.player.anchor.setTo(0.5);
+        this.player.animations.add('default', [0], 7, false);
         this.player.animations.add('forward', [2], 7, false);
         this.player.animations.add('backward', [3], 7, false);
         this.player.animations.add('elbow', [4], 7, false);
         this.player.animations.add('kick', [5], 7, false);
         this.player.animations.add('blast', [6, 7], 13, false);
         this.player.animations.add('damaged', [8], 13, false);
+        this.player.animations.add('thrownBack', [9, 8], 2, false);
+        this.player.animations.add('dazed', [11, 12], 4, true);
         this.game.physics.arcade.enable(this.player);
         this.player.body.collideWorldBounds = true;
 
@@ -148,6 +183,7 @@ GameObj.GameState = {
         this.defeatedStats = this.add.text(5, 77, '', style);
 
         this.levelLabel = this.add.text(this.game.world.centerX - 10, this.game.world.centerY, '', levelStyle);
+        this.levelLabel.anchor.setTo(0.5);
         this.refreshStats();
     },
     refreshStats: function() {
@@ -345,8 +381,9 @@ GameObj.GameState = {
     checkRemainingEnemyCount: function() {
         if (this.deadEnemies == this.currentLevelData.numberOfEnemies) {
             if (this.currentLevel == this.TOTAL_LEVELS) {
-                alert('You won! :D');
-                this.game.state.start('Game', true, false, 1);
+                //disable input and stop the scroll background
+                this.inputDisabled = true;
+                this.encounterFreeza();
             } else if (!this.loadingNextLevel) {
                 this.loadingNextLevel = true;
                 this.game.time.events.add(this.SECONDS_BETWEEN_LEVELS, function() {
@@ -362,5 +399,208 @@ GameObj.GameState = {
         setTimeout(function() {
             self.game.state.start('GameOver', true, false, self.player.customData);
         }, waitTime);
+    },
+    encounterFreeza: function() {
+        //add freeza
+        this.freeza = this.add.sprite(this.game.world.width + 10, this.game.world.centerY, 'freeza');
+        this.freeza.anchor.setTo(0.5);
+        this.freeza.scale.setTo(-1, 1);
+        this.game.physics.arcade.enable(this.freeza);
+        this.freeza.body.velocity.x = -100;
+        this.freeza.enableBody = true;
+        this.freeza.customData = {
+            health: 25,
+            powerLevel: 430000,
+            isInPosition: false,
+            damaged: false
+        };
+
+        //animations
+        this.freeza.animations.add('default', [0], 7, false);
+        this.freeza.animations.add('forward', [1], 7, false);
+        this.freeza.animations.add('kick', [2], 7, false);
+        this.freeza.animations.add('readyEnergyBomb', [3], 1, false);
+        this.freeza.animations.add('fireEnergyBomb', [4], 1, false);
+        this.freeza.animations.add('damagedA', [5], 1, false);
+        this.freeza.animations.add('damagedB', [6], 1, false);
+    },
+    checkFreezaPosition: function() {
+        if (this.freeza.position.x <= this.game.world.width - 20) {
+            var self = this;
+            this.freeza.customData.isInPosition = true;
+            this.background.autoScroll(0);
+            this.freeza.body.velocity.x = 0;
+            this.player.body.velocity.x = 0;
+
+            var movementTime = 500;
+
+            //define tweens
+            var playerMovement = this.game.add.tween(this.player);
+            playerMovement.to({
+                x: this.game.world.centerX - 30,
+                y: this.game.world.centerY
+            }, movementTime);
+
+            //start tweens
+            playerMovement.start();
+            playerMovement.onComplete.add(function() {
+                this.player.play('default');
+                this.player.play('blast');
+                this.createEnergyBlast();
+                setTimeout(function() {
+                    self.player.play('default');
+                }, 500);
+            }, this);
+        }
+    },
+    blastFreeza: function(freeza, energyBlast) {
+        energyBlast.kill();
+        if (!this.playerWon) {
+            var freezaMovement = this.game.add.tween(this.freeza);
+            freezaMovement.to({
+                x: this.game.world.centerX + 70,
+                y: this.game.world.centerY
+            }, 1500);
+
+            freezaMovement.start();
+            freezaMovement.onComplete.add(function() {
+                this.handleFreezaAttack();
+            }, this);
+        } else {
+            var freezaAttackedTween = this.game.add.tween(freeza);
+
+            freeza.customData.damaged = (freeza.customData.damaged == 'damagedA') ? 'damagedB' : 'damagedA';
+            freeza.play(freeza.customData.damaged);
+
+            freeza.body.velocity.x = (freeza.position.x >= this.game.world.width - 100) ? 0 : 100;
+
+            freezaAttackedTween.to({ tint: 0xFF0000 }, 100);
+
+            freezaAttackedTween.start();
+            freezaAttackedTween.onComplete.add(function() {
+                freeza.tint = 0xFFFFFF;
+                freeza.body.velocity.x = 0;
+                freeza.customData.health--;
+                if (freeza.customData.health == 0) {
+                    freeza.kill();
+                    var self = this;
+                    setTimeout(function(){
+                        self.handleEndGame(true);
+                    }, 2000);
+                }
+            }, this);
+        }
+    },
+    handleFreezaAttack: function() {
+        console.log('Fight!');
+        var self = this;
+
+        this.freeza.play('forward');
+        var freezaMovement = this.game.add.tween(this.freeza);
+        freezaMovement.to({
+            x: this.player.position.x + 20,
+            y: this.player.position.y
+        }, 100);
+        freezaMovement.start();
+
+        freezaMovement.onComplete.add(function() {
+            this.freeza.play('kick');
+            this.player.play('thrownBack');
+
+            var attackedTween = this.game.add.tween(this.player);
+            attackedTween.to({
+                x: this.player.position.x - 300,
+                y: this.player.position.y,
+                tint: 0xFF0000
+            }, 300);
+            attackedTween.onComplete.add(function() {
+                this.player.tint = 0xFFFFFF;
+                this.player.play('dazed');
+                this.handleFreezaEnergyBomb();
+            }, this);
+            attackedTween.start();
+        }, this);
+    },
+    handleFreezaEnergyBomb: function() {
+        var self = this;
+
+        this.freeza.play('readyEnergyBomb');
+        this.energyBomb = this.add.sprite(this.freeza.position.x + 10, this.freeza.position.y - 75, 'energyBomb');
+        this.energyBomb.anchor.setTo(0.5);
+        this.energyBomb.alpha = 0.8;
+
+        var fireTween = this.game.add.tween(this.energyBomb);
+        fireTween.to({
+            x: this.player.position.x,
+            y: this.player.position.y
+        }, 666);
+
+        setTimeout(function() {
+            self.energyBomb.scale.setTo(1.5);
+        }, 1000);
+
+        setTimeout(function() {
+            self.energyBomb.scale.setTo(2);
+        }, 2000);
+
+        setTimeout(function() {
+            self.freeza.play('fireEnergyBomb');
+            fireTween.start();
+        }, 3000);
+
+        fireTween.onComplete.add(function() {
+            if (this.player.customData.powerLevel >= this.freeza.customData.powerLevel) {
+                this.handlePlayerWin();
+            } else {
+                this.handleFreezaWin();
+            }
+        }, this);
+    },
+    handleFreezaWin: function() {
+        this.player.kill();
+        this.energyBomb.kill();
+        this.freeza.play('default');
+        this.handleEndGame(false);
+    },
+    handlePlayerWin: function() {
+        this.playerWon = true;
+        this.energyBomb.kill();
+        this.freeza.play('default');
+        this.player.play('default');
+
+        this.energyBlastsToThrow = 25;
+
+        this.barrageLoop = this.game.time.events.loop(150, this.handleBarrageAttack, this);
+    },
+    handleBarrageAttack: function() {
+        this.player.play('blast');
+        this.createEnergyBlast();
+        this.energyBlastsToThrow--;
+        if (this.energyBlastsToThrow == 0) {
+            this.game.time.events.remove(this.barrageLoop);
+            this.player.play('default');
+        }
+    },
+    handleEndGame: function(playerWon) {
+        this.game.world.removeAll();
+        this.gameHasEnded = true;
+        var endGameMessage;
+        if (playerWon) {
+            endGameMessage = 'Against all odds, Bardock was able to defeat Freeza and save his planet. ' +
+                'He went down in their history as the planet\'s savior and became the ' +
+                'new king of planet Vegeta. Stories are still told throughout the universe ' +
+                'about how King Bardock took down Freeza and ' + this.player.customData.enemiesDefeated +
+                ' of his soldiers.';
+        } else {
+            endGameMessage = 'Despite his efforts, Bardock was unable to defeat the tyrant Freeza. ' +
+                'He did however manage to take ' + this.player.customData.enemiesDefeated +
+                ' of Freeza\'s soldiers down with him. Even though the planet was destroyed, ' +
+                'Freeza still has many enemies. Surely one day the tyrant will answer for his ' +
+                'cruelty...';
+        }
+
+        var maxWordWrapWidth = this.game.world.width - 100;
+        var endGameStyle = { font: '10px PrStart', fill: '#fff', wordWrap: true, wordWrapWidth: maxWordWrapWidth };
+        var endGameLabel = this.game.add.text(50, 40, endGameMessage, endGameStyle);
     }
 };
