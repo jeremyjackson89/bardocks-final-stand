@@ -3,30 +3,30 @@
 		"enemies": ["guldo"],
 		"minSpeed": -160,
 		"maxSpeed": -180,
-		"numberOfEnemies": 1
+		"numberOfEnemies": 100
 	},
 	"level-2":{
 		"enemies": ["guldo", "recoome"],
 		"minSpeed": -180,
 		"maxSpeed": -200,
-		"numberOfEnemies": 2
+		"numberOfEnemies": 200
 	},
 	"level-3":{
 		"enemies": ["guldo", "recoome", "jeice"],
 		"minSpeed": -190,
 		"maxSpeed": -210,
-		"numberOfEnemies": 3
+		"numberOfEnemies": 300
 	},
 	"level-4":{
 		"enemies": ["guldo", "recoome", "jeice", "burter"],
 		"minSpeed": -200,
 		"maxSpeed": -220,
-		"numberOfEnemies": 4
+		"numberOfEnemies": 400
 	},
 	"level-5":{
 		"enemies": ["guldo", "recoome", "jeice", "burter", "ginyu"],
 		"minSpeed": -210,
 		"maxSpeed": -230,
-		"numberOfEnemies": 1
+		"numberOfEnemies": 500
 	}
 }
