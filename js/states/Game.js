@@ -45,10 +45,10 @@ GameObj.GameState = {
         this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.restoreEnegry, this);
     },
     update: function() {
-        if (!this.inputDisabled) {
-            this.player.body.velocity.y = 0;
-            this.player.body.velocity.x = 0;
+        this.player.body.velocity.y = 0;
+        this.player.body.velocity.x = 0;
 
+        if (!this.inputDisabled) {
             //collision detections
             this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
             this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
@@ -492,7 +492,6 @@ GameObj.GameState = {
         }
     },
     handleFreezaAttack: function() {
-        console.log('Fight!');
         var self = this;
 
         this.freeza.play('forward');
@@ -508,8 +507,11 @@ GameObj.GameState = {
             this.player.play('thrownBack');
 
             var attackedTween = this.game.add.tween(this.player);
+            var knockBack = this.player.position.x - 300;
+            if(knockBack < 0 ) knockBack = 0;
+
             attackedTween.to({
-                x: this.player.position.x - 300,
+                x: knockBack,
                 y: this.player.position.y,
                 tint: 0xFF0000
             }, 300);
