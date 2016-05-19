@@ -110,7 +110,7 @@ GameObj.GameState = {
                 restartGame();
             }
 
-            function restartGame(){
+            function restartGame() {
                 self.game.input.keyboard.onDownCallback = null;
                 self.state.start('Home');
             }
@@ -383,7 +383,14 @@ GameObj.GameState = {
             if (this.currentLevel == this.TOTAL_LEVELS) {
                 //disable input and stop the scroll background
                 this.inputDisabled = true;
-                var millisecondsToWait = 5 * 1000;
+                var millisecondsToWait = 7 * 1000;
+
+                this.levelLabel.text = 'FREEZA';
+                var self = this;
+                setTimeout(function() {
+                    self.levelLabel.text = '';
+                }, 3500);
+
                 this.game.time.events.add(millisecondsToWait, function() {
                     this.encounterFreeza();
                 }, this);
@@ -487,7 +494,7 @@ GameObj.GameState = {
                 if (freeza.customData.health == 0) {
                     freeza.kill();
                     var self = this;
-                    setTimeout(function(){
+                    setTimeout(function() {
                         self.handleEndGame(true);
                     }, 2000);
                 }
@@ -511,7 +518,7 @@ GameObj.GameState = {
 
             var attackedTween = this.game.add.tween(this.player);
             var knockBack = this.player.position.x - 300;
-            if(knockBack < 0 ) knockBack = 0;
+            if (knockBack < 0) knockBack = 0;
 
             attackedTween.to({
                 x: knockBack,
