@@ -21,7 +21,7 @@ GameObj.GameState = {
 
         //level data
         this.TOTAL_LEVELS = 5;
-        this.currentLevel = currentLevel ? currentLevel : 1;
+        this.currentLevel = currentLevel ? currentLevel : 5;
         this.inputDisabled = false;
         this.playerWon = false;
         this.gameHasEnded = false;
@@ -383,7 +383,10 @@ GameObj.GameState = {
             if (this.currentLevel == this.TOTAL_LEVELS) {
                 //disable input and stop the scroll background
                 this.inputDisabled = true;
-                this.encounterFreeza();
+                var millisecondsToWait = 5 * 1000;
+                this.game.time.events.add(millisecondsToWait, function() {
+                    this.encounterFreeza();
+                }, this);
             } else if (!this.loadingNextLevel) {
                 this.loadingNextLevel = true;
                 this.game.time.events.add(this.SECONDS_BETWEEN_LEVELS, function() {
