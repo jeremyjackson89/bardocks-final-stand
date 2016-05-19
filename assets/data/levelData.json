@@ -27,6 +27,6 @@
 		"enemies": ["guldo", "recoome", "jeice", "burter", "ginyu"],
 		"minSpeed": -210,
 		"maxSpeed": -230,
-		"numberOfEnemies": 5
+		"numberOfEnemies": 500
 	}
 }
