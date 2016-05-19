@@ -21,7 +21,7 @@ GameObj.GameState = {
 
         //level data
         this.TOTAL_LEVELS = 5;
-        this.currentLevel = currentLevel ? currentLevel : 5;
+        this.currentLevel = currentLevel ? currentLevel : 1;
         this.inputDisabled = false;
         this.playerWon = false;
         this.gameHasEnded = false;
