@@ -29,10 +29,10 @@ GameObj.GameState = {
     create: function() {
         //sounds
         this.blastSound = this.add.audio('blast');
-        this.blastSound.volume = 0.6;
+        this.blastSound.volume = 0.3;
 
         this.hurtSound = this.add.audio('hurt');
-        this.hurtSound.volume = 0.4;
+        this.hurtSound.volume = 0.3;
 
         //background
         this.background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
