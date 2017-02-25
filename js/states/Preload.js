@@ -29,6 +29,10 @@ GameObj.PreloadState = {
     this.load.atlasJSONHash('burter', 'assets/images/burter-sheet.png', 'assets/images/burter-sheet.json');
     this.load.atlasJSONHash('ginyu', 'assets/images/ginyu-sheet.png', 'assets/images/ginyu-sheet.json');
     this.load.atlasJSONHash('freeza', 'assets/images/freeza-sheet-2.png', 'assets/images/freeza-sheet-2.json');
+
+     //sound effects
+    this.load.audio('blast', ['assets/audio/blast.wav']);
+    this.load.audio('hurt', ['assets/audio/hurt.wav']);
   },
   create: function() {
     this.state.start('Home');

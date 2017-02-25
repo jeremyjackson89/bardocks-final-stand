@@ -19,10 +19,28 @@ GameObj.Enemy.prototype.constructor = GameObj.Enemy;
 
 GameObj.Enemy.prototype.update = function() {
     this.body.velocity.x = this.customData.speedX;
+    this.position.y = this.position.y;
+
+    var randomSpeed = getRandomSpeed();
+
+    if(this.position.y < GameObj.GameState.player.y) {
+        this.position.y += randomSpeed;
+    }
+
+    if(this.position.y > GameObj.GameState.player.y) {
+        this.position.y -= randomSpeed;
+    }
+
     //kill if off screen and not already dead
     if (this.position.x <= 0 && this.alive && !this.customData.damaged) {
         this.destroy();
         GameObj.GameState.deadEnemies += 1;
+    }
+
+    function getRandomSpeed() {
+        var min = 0.3;
+        var max = 0.8;
+        return Math.floor(Math.random()*(max-min+1)+min);
     }
 };
 

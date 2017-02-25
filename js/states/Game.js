@@ -27,6 +27,13 @@ GameObj.GameState = {
         this.gameHasEnded = false;
     },
     create: function() {
+        //sounds
+        this.blastSound = this.add.audio('blast');
+        this.blastSound.volume = 0.6;
+
+        this.hurtSound = this.add.audio('hurt');
+        this.hurtSound.volume = 0.4;
+
         //background
         this.background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
         this.background.autoScroll(-130, 0);
@@ -224,6 +231,7 @@ GameObj.GameState = {
         }
         //set velocity
         energyBlast.body.velocity.x = this.ENERGY_BLAST_SPEED;
+        this.blastSound.play();
     },
     createEnemy: function(enemyData) {
         var enemy = this.enemies.getFirstExists(false);
@@ -241,6 +249,7 @@ GameObj.GameState = {
             enemy.frame = 3;
             enemy.customData.damaged = true;
             energyBlast.kill();
+            this.hurtSound.play();
             this.killEnemy(enemy);
         }
     },
@@ -250,10 +259,12 @@ GameObj.GameState = {
             enemy.customData.damaged = true;
             enemy.frame = 2;
             this.killEnemy(enemy);
+            this.hurtSound.play();
         } else if (enemyCanDamage && !player.customData.damaged && !enemy.customData.damaged) {
             player.play('damaged');
             this.handlePlayerDamage(player);
             player.customData.damaged = true;
+            this.hurtSound.play();
         }
     },
     killEnemy: function(enemy) {
