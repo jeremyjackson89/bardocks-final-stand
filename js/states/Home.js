@@ -27,7 +27,10 @@ GameObj.HomeState = {
         startLabel.anchor.set(0.5);
 
         var creditStyle = { font: '8px PrStart', fill: '#fff' };
-        var creatorLabel = this.game.add.text(10, (this.game.world.height - 15), 'MYSTICJ GAMES', creditStyle);
+        var createdByLabel = this.game.add.text(10, (this.game.world.height - 60), 'PROGRAMMING', startStyle);
+        var creatorLabel = this.game.add.text(10, (this.game.world.height - 45), 'JEREMY JACKSON', creditStyle);
+        var musicByLabel = this.game.add.text(10, (this.game.world.height - 30), 'MUSIC', startStyle);
+        var musicLabel = this.game.add.text(10, (this.game.world.height - 15), 'JAMIE OBESO', creditStyle);
     },
     update: function() {
         var self = this;
