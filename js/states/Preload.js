@@ -20,6 +20,9 @@ GameObj.PreloadState = {
     this.load.image('dataPanel', 'assets/images/sprites/data-panel-2.png');
     this.load.image('energyBlast', 'assets/images/sprites/energy-blast.png');
     this.load.image('energyBomb', 'assets/images/sprites/energy-bomb.png');
+    this.load.image('infiniteBlast', 'assets/images/sprites/item-blast-infinite.png');
+    this.load.image('largeBlast', 'assets/images/sprites/item-blast-large.png');
+    this.load.image('healthPack', 'assets/images/sprites/item-health.png');
 
     //sprite sheets
     this.load.atlasJSONHash('player', 'assets/images/bardock-sheet.png', 'assets/images/bardock-sheet.json');
@@ -33,6 +36,7 @@ GameObj.PreloadState = {
      //sound effects
     this.load.audio('blast', ['assets/audio/blast.wav']);
     this.load.audio('hurt', ['assets/audio/hurt.wav']);
+    this.load.audio('pickup', ['assets/audio/pickup.wav']);
   },
   create: function() {
     this.state.start('Home');

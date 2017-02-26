@@ -10,6 +10,8 @@ GameObj.GameState = {
         this.PLAYER_STARTING_POINT = 45;
         this.MAX_PLAYER_X = (this.game.world.width / 3 > 120) ? this.game.world.width / 3 : 120;
         this.SECONDS_BETWEEN_LEVELS = 5;
+        this.ITEM_INTERVAL = 2000;
+        this.ITEMS = ['healthPack', 'largeBlast', 'infiniteBlast'];
 
         //keyboard cursors
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -34,6 +36,9 @@ GameObj.GameState = {
         this.hurtSound = this.add.audio('hurt');
         this.hurtSound.volume = 0.3;
 
+        this.pickupSound = this.add.audio('pickup');
+        this.pickupSound.volume = 0.3;
+
         //background
         this.background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
         this.background.autoScroll(-130, 0);
@@ -47,9 +52,10 @@ GameObj.GameState = {
         //set up groups
         this.initializeEnergyBlasts();
         this.initializeEnemies();
+        this.initializeItems();
         this.loadLevelData();
 
-        this.game.time.events.loop(Phaser.Timer.SECOND * 2, this.restoreEnegry, this);
+        this.game.time.events.loop(Phaser.Timer.SECOND * 4, this.restoreEnegry, this);
     },
     update: function() {
         this.player.body.velocity.y = 0;
@@ -59,6 +65,7 @@ GameObj.GameState = {
             //collision detections
             this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
             this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
+            this.game.physics.arcade.overlap(this.player, this.items, this.handleItemPickup, null, this);
 
             //attacks
             if (this.elbowKey && this.elbowKey.downDuration(this.KEY_DOWN_DURATION)) {
@@ -131,7 +138,9 @@ GameObj.GameState = {
                 if (this.blastFired) {
                     this.createEnergyBlast();
                     this.blastFired = false;
-                    this.player.customData.energy -= 1;
+                    if(!this.infiniteBlastsEnabled){                        
+                        this.player.customData.energy -= 1;
+                    }
                 }
                 if (this.playerAttacking) {
                     this.playerAttacking = false;
@@ -149,7 +158,7 @@ GameObj.GameState = {
         this.player.animations.add('elbow', [4], 7, false);
         this.player.animations.add('kick', [5], 7, false);
         this.player.animations.add('blast', [6, 7], 13, false);
-        this.player.animations.add('damaged', [8], 13, false);
+        this.player.animations.add('damaged', [8], 7, false);
         this.player.animations.add('thrownBack', [9, 8], 2, false);
         this.player.animations.add('dazed', [11, 12], 4, true);
         this.game.physics.arcade.enable(this.player);
@@ -210,6 +219,10 @@ GameObj.GameState = {
         this.enemies = this.add.group();
         this.enemies.enableBody = true;
     },
+    initializeItems: function() {
+        this.items = this.add.group();
+        this.items.enableBody = true;
+    },
     restoreEnegry: function() {
         if (this.player.customData.energy < this.player.customData.maxEnergy) {
             var maxToRestore = Math.round(this.player.customData.maxEnergy / 10);
@@ -244,11 +257,24 @@ GameObj.GameState = {
             enemy.reset(enemyX, enemyY, enemyData);
         }
     },
+    createItem: function(itemData) {
+        var item = this.items.getFirstExists(false);
+        var itemX = this.game.world.width + itemData.x;
+        var itemY = itemData.y;
+        if (!item) {
+            item = new GameObj.Item(this.game, itemX, itemY, itemData);
+            this.items.add(item);
+        } else {
+            item.reset(itemX, itemY, itemData);
+        }
+    },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
             enemy.frame = 3;
             enemy.customData.damaged = true;
-            energyBlast.kill();
+            if (!this.largeBlastsEnabled) {
+                energyBlast.kill();
+            }
             this.hurtSound.play();
             this.killEnemy(enemy);
         }
@@ -266,6 +292,47 @@ GameObj.GameState = {
             player.customData.damaged = true;
             this.hurtSound.play();
         }
+    },
+    handleItemPickup: function(player, item) {
+        console.log('ITEM', item);
+        switch (item.customData.type) {
+            case 'healthPack':
+                this.restoreHealth();
+                break;
+            case 'largeBlast':
+                this.handleLargerBlasts();
+                break;
+            default:
+                this.handleInfiniteBlasts();
+                break;
+        }
+        item.destroy();
+        this.pickupSound.play();
+    },
+    restoreHealth: function() {
+        var currentHealthDifference = this.player.customData.maxHealth - this.player.customData.health;
+        var maxHealthRestore = Math.round(this.player.customData.maxHealth / 4);
+        var amountOfHealthToRestore = maxHealthRestore;
+        if ((maxHealthRestore + this.player.customData.health) > this.player.customData.maxHealth) {
+            amountOfHealthToRestore = currentHealthDifference;
+        }
+        this.player.customData.health += amountOfHealthToRestore;
+    },
+    handleLargerBlasts: function() {
+        this.restoreEnegry();
+        var largerBlastTime = 5 * 1000;
+        this.largeBlastsEnabled = true;
+        this.game.time.events.add(largerBlastTime, function() {
+            this.largeBlastsEnabled = false;
+        }, this);
+    },
+    handleInfiniteBlasts: function() {
+        this.restoreEnegry();
+        var infiniteBlastTime = 5 * 1000;
+        this.infiniteBlastsEnabled = true;
+        this.game.time.events.add(infiniteBlastTime, function() {
+            this.infiniteBlastsEnabled = false;
+        }, this);
     },
     killEnemy: function(enemy) {
         var attackedTween = this.game.add.tween(enemy);
@@ -293,13 +360,7 @@ GameObj.GameState = {
 
             //increase and restore some health
             this.player.customData.maxHealth += healthIncrease;
-            var currentHealthDifference = this.player.customData.maxHealth - this.player.customData.health;
-            var maxHealthRestore = Math.round(this.player.customData.maxHealth / 4);
-            var amountOfHealthToRestore = maxHealthRestore;
-            if ((maxHealthRestore + this.player.customData.health) > this.player.customData.maxHealth) {
-                amountOfHealthToRestore = currentHealthDifference;
-            }
-            this.player.customData.health += amountOfHealthToRestore;
+            // this.restoreHealth();
 
             //increase and restore some energy
             this.player.customData.maxEnergy += energyIncrease;
@@ -345,6 +406,7 @@ GameObj.GameState = {
         }, 1500);
 
         this.generateEnemyData();
+        this.scheduleNextItem();
     },
     generateEnemyData: function() {
         var startingX = 10;
@@ -385,6 +447,24 @@ GameObj.GameState = {
                 this.scheduleNextEnemy();
             }, this);
         }
+    },
+    scheduleNextItem: function() {
+        this.nextItemTimer = this.game.time.events.add(this.ITEM_INTERVAL, function() {
+            if (!this.loadingNextLevel && !this.freeza) {
+                var minY = this.MIN_Y;
+                var maxY = this.game.world.height - 10;
+                var itemType = this.ITEMS[this.getRandomInt(0, 2)];
+                var minSpeed = this.currentLevelData.minSpeed;
+                var maxSpeed = this.currentLevelData.maxSpeed;
+                this.createItem({
+                    x: 10,
+                    y: this.getRandomInt(minY, maxY),
+                    speedX: this.getRandomInt(minSpeed, maxSpeed),
+                    type: itemType
+                });
+            }
+            this.scheduleNextItem();
+        }, this);
     },
     getRandomInt: function(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
