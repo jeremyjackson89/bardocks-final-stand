@@ -10,7 +10,7 @@ GameObj.GameState = {
         this.PLAYER_STARTING_POINT = 45;
         this.MAX_PLAYER_X = (this.game.world.width / 3 > 120) ? this.game.world.width / 3 : 120;
         this.SECONDS_BETWEEN_LEVELS = 5;
-        this.ITEM_INTERVAL = 2000;
+        this.ITEM_INTERVAL = 13 * 1000;
         this.ITEMS = ['healthPack', 'largeBlast', 'infiniteBlast'];
 
         //keyboard cursors
@@ -502,6 +502,8 @@ GameObj.GameState = {
         }, waitTime);
     },
     encounterFreeza: function() {
+        this.freezaBlastSound = this.add.audio('freezaBlast');
+        this.freezaBlastSound.volume = 0.3;
         //add freeza
         this.freeza = this.add.sprite(this.game.world.width + 10, this.game.world.centerY, 'freeza');
         this.freeza.anchor.setTo(0.5);
@@ -556,6 +558,7 @@ GameObj.GameState = {
     },
     blastFreeza: function(freeza, energyBlast) {
         energyBlast.kill();
+        this.hurtSound.play();
         if (!this.playerWon) {
             var freezaMovement = this.game.add.tween(this.freeza);
             freezaMovement.to({
@@ -605,6 +608,7 @@ GameObj.GameState = {
 
         freezaMovement.onComplete.add(function() {
             this.freeza.play('kick');
+            this.hurtSound.play();
             this.player.play('thrownBack');
 
             var attackedTween = this.game.add.tween(this.player);
@@ -631,6 +635,7 @@ GameObj.GameState = {
         this.energyBomb = this.add.sprite(this.freeza.position.x + 10, this.freeza.position.y - 75, 'energyBomb');
         this.energyBomb.anchor.setTo(0.5);
         this.energyBomb.alpha = 0.8;
+        this.freezaBlastSound.play();
 
         var fireTween = this.game.add.tween(this.energyBomb);
         fireTween.to({
@@ -639,14 +644,18 @@ GameObj.GameState = {
         }, 666);
 
         setTimeout(function() {
+            self.freezaBlastSound.play();
             self.energyBomb.scale.setTo(1.5);
         }, 1000);
 
         setTimeout(function() {
+            self.freezaBlastSound.play();
             self.energyBomb.scale.setTo(2);
         }, 2000);
 
         setTimeout(function() {
+            self.freezaBlastSound.play();
+            self.blastSound.play();
             self.freeza.play('fireEnergyBomb');
             fireTween.start();
         }, 3000);

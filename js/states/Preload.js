@@ -37,6 +37,7 @@ GameObj.PreloadState = {
     this.load.audio('blast', ['assets/audio/blast.wav']);
     this.load.audio('hurt', ['assets/audio/hurt.wav']);
     this.load.audio('pickup', ['assets/audio/pickup.wav']);
+    this.load.audio('freezaBlast', ['assets/audio/freeza_blast.wav']);
   },
   create: function() {
     this.state.start('Home');
