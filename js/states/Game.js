@@ -20,6 +20,9 @@ GameObj.GameState = {
         this.elbowKey = this.game.input.keyboard.addKey(Phaser.Keyboard.Z);
         this.kickKey = this.game.input.keyboard.addKey(Phaser.Keyboard.X);
         this.energyKey = this.game.input.keyboard.addKey(Phaser.Keyboard.C);
+        this.pauseKey = this.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+
+        this.pauseKey.onDown.add(pauseGame, this);
 
         //level data
         this.TOTAL_LEVELS = 5;
@@ -27,6 +30,14 @@ GameObj.GameState = {
         this.inputDisabled = false;
         this.playerWon = false;
         this.gameHasEnded = false;
+
+        function pauseGame() {
+            this.pauseLabel.text = '';
+            GameObj.game.paused = !GameObj.game.paused;
+            if(GameObj.game.paused) {
+                this.pauseLabel.text = 'PAUSED';
+            }
+        }
     },
     create: function() {
         //sounds
@@ -138,7 +149,7 @@ GameObj.GameState = {
                 if (this.blastFired) {
                     this.createEnergyBlast();
                     this.blastFired = false;
-                    if(!this.infiniteBlastsEnabled){                        
+                    if (!this.infiniteBlastsEnabled) {
                         this.player.customData.energy -= 1;
                     }
                 }
@@ -200,6 +211,10 @@ GameObj.GameState = {
 
         this.levelLabel = this.add.text(this.game.world.centerX - 10, this.game.world.centerY, '', levelStyle);
         this.levelLabel.anchor.setTo(0.5);
+
+        this.pauseLabel = this.add.text(this.game.world.centerX - 10, this.game.world.centerY, '', levelStyle);
+        this.pauseLabel.anchor.setTo(0.5);
+
         this.refreshStats();
     },
     refreshStats: function() {
