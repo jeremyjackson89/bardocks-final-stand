@@ -169,7 +169,7 @@ GameObj.GameState = {
         this.player.animations.add('elbow', [4], 7, false);
         this.player.animations.add('kick', [5], 7, false);
         this.player.animations.add('blast', [6, 7], 13, false);
-        this.player.animations.add('damaged', [8], 7, false);
+        this.player.animations.add('damaged', [8], 3, false);
         this.player.animations.add('thrownBack', [9, 8], 2, false);
         this.player.animations.add('dazed', [11, 12], 4, true);
         this.game.physics.arcade.enable(this.player);
@@ -402,7 +402,7 @@ GameObj.GameState = {
                 //let the player be invincible for a second after being hit
                 setTimeout(function() {
                     player.customData.damaged = false;
-                }, 1000);
+                }, 100);
             }
         }, this);
         attackedTween.start();
