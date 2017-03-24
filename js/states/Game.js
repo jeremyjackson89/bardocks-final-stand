@@ -402,7 +402,7 @@ GameObj.GameState = {
                 //let the player be invincible for a second after being hit
                 setTimeout(function() {
                     player.customData.damaged = false;
-                }, 100);
+                }, 250);
             }
         }, this);
         attackedTween.start();
