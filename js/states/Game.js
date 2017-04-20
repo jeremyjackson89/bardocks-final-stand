@@ -34,7 +34,7 @@ GameObj.GameState = {
         function pauseGame() {
             this.pauseLabel.text = '';
             GameObj.game.paused = !GameObj.game.paused;
-            if(GameObj.game.paused) {
+            if (GameObj.game.paused) {
                 this.pauseLabel.text = 'PAUSED';
             }
         }
@@ -44,8 +44,14 @@ GameObj.GameState = {
         this.blastSound = this.add.audio('blast');
         this.blastSound.volume = 0.3;
 
+        this.noEnergySound = this.add.audio('noEnergy');
+        this.noEnergySound.volume = 0.3;
+
         this.hurtSound = this.add.audio('hurt');
         this.hurtSound.volume = 0.3;
+
+        this.bardockHurtSound = this.add.audio('bardock_hurt');
+        this.bardockHurtSound.volume = 0.3;
 
         this.pickupSound = this.add.audio('pickup');
         this.pickupSound.volume = 0.3;
@@ -90,6 +96,8 @@ GameObj.GameState = {
             if (this.energyKey.isDown && this.player.customData.energy > 0) {
                 this.player.play('blast');
                 this.blastFired = true;
+            } else if (this.energyKey.downDuration(250) && this.player.customData.energy < 1) {
+                this.noEnergySound.play();
             }
 
             //movement
@@ -305,7 +313,7 @@ GameObj.GameState = {
             player.play('damaged');
             this.handlePlayerDamage(player);
             player.customData.damaged = true;
-            this.hurtSound.play();
+            this.bardockHurtSound.play();
         }
     },
     handleItemPickup: function(player, item) {

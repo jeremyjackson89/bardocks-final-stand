@@ -35,7 +35,9 @@ GameObj.PreloadState = {
 
      //sound effects
     this.load.audio('blast', ['assets/audio/blast.wav']);
+    this.load.audio('noEnergy', ['assets/audio/no_energy.wav']);
     this.load.audio('hurt', ['assets/audio/hurt.wav']);
+    this.load.audio('bardock_hurt', ['assets/audio/bardock_hurt.wav']);
     this.load.audio('pickup', ['assets/audio/pickup.wav']);
     this.load.audio('freezaBlast', ['assets/audio/freeza_blast.wav']);
   },
