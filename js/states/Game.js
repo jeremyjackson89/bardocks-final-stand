@@ -96,7 +96,7 @@ GameObj.GameState = {
             if (this.energyKey.isDown && this.player.customData.energy > 0) {
                 this.player.play('blast');
                 this.blastFired = true;
-            } else if (this.energyKey.downDuration(250) && this.player.customData.energy < 1) {
+            } else if (this.energyKey.downDuration(this.KEY_DOWN_DURATION) && this.player.customData.energy < 1) {
                 this.noEnergySound.play();
             }
 
@@ -293,28 +293,48 @@ GameObj.GameState = {
     },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
+            var originalFrame = enemy.frame;
+            var blastDamage = 1;
             enemy.frame = 3;
             enemy.customData.damaged = true;
             if (!this.largeBlastsEnabled) {
                 energyBlast.kill();
+            } else {
+                blastDamage++;
             }
+            enemy.customData.health -= blastDamage;
             this.hurtSound.play();
-            this.killEnemy(enemy);
+            if (enemy.customData.health < 1) {
+                return this.killEnemy(enemy);
+            } 
+            this.scheduleEnemyRecovery(enemy, originalFrame);
         }
     },
     handleAttack: function(player, enemy) {
         var enemyCanDamage = enemy.position.x >= player.position.x;
         if (this.playerAttacking && !enemy.customData.damaged) {
+            var originalFrame = enemy.frame;
             enemy.customData.damaged = true;
             enemy.frame = 2;
-            this.killEnemy(enemy);
+            enemy.customData.health--;
             this.hurtSound.play();
+            if (enemy.customData.health < 1) {
+                return this.killEnemy(enemy);
+            } 
+            this.scheduleEnemyRecovery(enemy, originalFrame);
         } else if (enemyCanDamage && !player.customData.damaged && !enemy.customData.damaged) {
             player.play('damaged');
             this.handlePlayerDamage(player);
             player.customData.damaged = true;
             this.bardockHurtSound.play();
         }
+    },
+    scheduleEnemyRecovery: function(enemy, originalFrame) {
+        var damagedTime = 250;
+        this.game.time.events.add(damagedTime, function() {
+            enemy.frame = originalFrame;
+            enemy.customData.damaged = false;
+        }, this);
     },
     handleItemPickup: function(player, item) {
         console.log('ITEM', item);
@@ -441,6 +461,10 @@ GameObj.GameState = {
 
         var minSpeed = this.currentLevelData.minSpeed;
         var maxSpeed = this.currentLevelData.maxSpeed;
+
+        var minHealth = 1;
+        var maxHealth = (this.currentLevel > 2 ? 2 : minHealth);
+
         var minY = this.MIN_Y;
         var maxY = this.game.world.height - 10;
 
@@ -453,6 +477,7 @@ GameObj.GameState = {
                 x: startingX,
                 y: this.getRandomInt(minY, maxY),
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
+                health: this.getRandomInt(minHealth, maxHealth),
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
                 powerUp: this.getRandomInt(300, 700)

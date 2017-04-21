@@ -11,19 +11,19 @@ GameObj.HomeState = {
         var storyStyle = { font: '9px PrStart', fill: '#fff', wordWrap: true, wordWrapWidth: maxWordWrapWidth };
         var storyLabel = this.game.add.text(50, 40, '', storyStyle);
         storyLabel.text = 'The evil lord Freeza travels from world to world to ' +
-                            'enslave their people and then \'employ\' them to do his bidding. ' + 
-                            'A rebellion has begun to unfold on one such world -- planet Vegeta. ' + 
-                            'Fearing a large uprising, Freeza decided to eliminate the threat and destroy the planet. ' +
-                            'One of the planet\'s inhabitants, Bardock, has chosen to confront Freeza, ' +
-                            'but he\'ll have to make it through many of Freeza\'s soldiers to get to him.' + 
-                            '\nThis is...';
+            'enslave their people and then \'employ\' them to do his bidding. ' +
+            'A rebellion has begun to unfold on one such world -- planet Vegeta. ' +
+            'Fearing a large uprising, Freeza decided to eliminate the threat and destroy the planet. ' +
+            'One of the planet\'s inhabitants, Bardock, has chosen to confront Freeza, ' +
+            'but he\'ll have to make it through many of Freeza\'s soldiers to get to him.' +
+            '\nThis is...';
 
         var titleStyle = { font: '15px PrStart', fill: '#fff', align: 'center' };
-        var titleLabel = this.game.add.text(this.game.world.centerX, 350, 'BARDOCK\'S\nFINAL STAND', titleStyle);
+        var titleLabel = this.game.add.text(this.game.world.centerX, 250, 'BARDOCK\'S\nFINAL STAND', titleStyle);
         titleLabel.anchor.set(0.5);
 
         var startStyle = { font: '10px PrStart', fill: '#fff' };
-        var startLabel = this.game.add.text(this.game.world.centerX, 400, '(PRESS ANY KEY TO START)', startStyle);
+        var startLabel = this.game.add.text(this.game.world.centerX, 300, '(PRESS ANY KEY TO START)', startStyle);
         startLabel.anchor.set(0.5);
 
         var creditStyle = { font: '8px PrStart', fill: '#fff' };
@@ -31,6 +31,15 @@ GameObj.HomeState = {
         var creatorLabel = this.game.add.text(10, (this.game.world.height - 45), 'JEREMY JACKSON', creditStyle);
         var musicByLabel = this.game.add.text(10, (this.game.world.height - 30), 'MUSIC', startStyle);
         var musicLabel = this.game.add.text(10, (this.game.world.height - 15), 'JAMIE OBESO', creditStyle);
+
+        var controlStyle = { font: '7px PrStart', fill: '#fff' };
+        this.game.add.text((this.game.world.width - 180), (this.game.world.height - 60), 'CONTROLS', startStyle);
+        this.game.add.text((this.game.world.width - 220), (this.game.world.height - 45), 'Z - ELBOW', controlStyle);
+        this.game.add.text((this.game.world.width - 220), (this.game.world.height - 30), 'X - KICK', controlStyle);
+        this.game.add.text((this.game.world.width - 220), (this.game.world.height - 15), 'C - BLAST', controlStyle);
+        this.game.add.text((this.game.world.width - 140), (this.game.world.height - 45), 'ENTER - PAUSE', controlStyle);
+        this.game.add.text((this.game.world.width - 140), (this.game.world.height - 30), 'ARROWS KEYS - MOVE', controlStyle);
+
     },
     update: function() {
         var self = this;
@@ -41,7 +50,7 @@ GameObj.HomeState = {
             self.startGame();
         }
     },
-    startGame: function(event){
+    startGame: function(event) {
         this.game.input.keyboard.onDownCallback = null;
         this.state.start('Game');
     }
