@@ -397,10 +397,13 @@ GameObj.GameState = {
         }
     },
     handlePlayerDamage: function(player) {
+        var shakeIntensity = 0.02;
+        var damageDuration = 250;
         var damage = 5;
         player.customData.health = (player.customData.health < damage) ? 0 : player.customData.health -= damage
         var attackedTween = this.game.add.tween(player);
-        attackedTween.to({ tint: 0xFF0000 }, 100);
+        this.game.camera.shake(shakeIntensity, damageDuration);
+        attackedTween.to({ tint: 0xFF0000 }, damageDuration);
         attackedTween.onComplete.add(function() {
             player.tint = 0xFFFFFF;
             if (player.customData.health < 1) {
@@ -410,7 +413,7 @@ GameObj.GameState = {
                 //let the player be invincible for a second after being hit
                 setTimeout(function() {
                     player.customData.damaged = false;
-                }, 250);
+                }, damageDuration);
             }
         }, this);
         attackedTween.start();
