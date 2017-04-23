@@ -36,7 +36,7 @@ GameObj.Enemy.prototype.update = function() {
     }
 
     //kill if off screen and not already dead
-    if (this.position.x <= 0 && this.alive && !this.customData.damaged) {
+    if (this.position.x <= 0) {
         this.destroy();
         GameObj.GameState.deadEnemies += 1;
     }
