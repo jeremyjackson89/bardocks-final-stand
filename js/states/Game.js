@@ -12,6 +12,8 @@ GameObj.GameState = {
         this.SECONDS_BETWEEN_LEVELS = 5;
         this.ITEM_INTERVAL = 13 * 1000;
         this.ITEMS = ['healthPack', 'largeBlast', 'infiniteBlast'];
+        this.ATTACK_DAMAGE = 1;
+        this.KNOCKBACK_DISTANCE = 25;
 
         //keyboard cursors
         this.cursors = this.game.input.keyboard.createCursorKeys();
@@ -293,41 +295,50 @@ GameObj.GameState = {
     },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
-            var originalFrame = enemy.frame;
-            var blastDamage = 1;
-            enemy.frame = 3;
-            enemy.customData.damaged = true;
+            var blastDamage = this.ATTACK_DAMAGE;
             if (!this.largeBlastsEnabled) {
                 energyBlast.kill();
             } else {
                 blastDamage++;
             }
-            enemy.customData.health -= blastDamage;
-            this.hurtSound.play();
-            if (enemy.customData.health < 1) {
-                return this.killEnemy(enemy);
-            } 
-            this.scheduleEnemyRecovery(enemy, originalFrame);
+            this.damageEnemy(enemy, 'blast', blastDamage);
         }
     },
     handleAttack: function(player, enemy) {
         var enemyCanDamage = enemy.position.x >= player.position.x;
         if (this.playerAttacking && !enemy.customData.damaged) {
-            var originalFrame = enemy.frame;
-            enemy.customData.damaged = true;
-            enemy.frame = 2;
-            enemy.customData.health--;
-            this.hurtSound.play();
-            if (enemy.customData.health < 1) {
-                return this.killEnemy(enemy);
-            } 
-            this.scheduleEnemyRecovery(enemy, originalFrame);
+            this.damageEnemy(enemy, 'attack', this.ATTACK_DAMAGE);
         } else if (enemyCanDamage && !player.customData.damaged && !enemy.customData.damaged) {
             player.play('damaged');
             this.handlePlayerDamage(player);
             player.customData.damaged = true;
             this.bardockHurtSound.play();
         }
+    },
+    damageEnemy: function(enemy, damageType, damageAmount) {
+        var originalFrame = enemy.frame;
+        enemy.customData.damaged = true;
+
+        if (damageType == 'blast') {
+            enemy.frame = 3;
+        } else {
+            enemy.frame = 2;
+        }
+
+        enemy.customData.health -= damageAmount;
+        this.hurtSound.play();
+
+        if (enemy.customData.health < 1) {
+            return this.killEnemy(enemy);
+        }
+        this.knockbackEnemy(enemy);
+        this.scheduleEnemyRecovery(enemy, originalFrame);
+    },
+    knockbackEnemy: function(enemy) {
+        var knockbackTime = 250;
+        var knockbackTween = this.game.add.tween(enemy);
+        knockbackTween.to({ x: enemy.position.x + this.KNOCKBACK_DISTANCE }, knockbackTime);
+        knockbackTween.start();
     },
     scheduleEnemyRecovery: function(enemy, originalFrame) {
         var damagedTime = 250;
@@ -337,7 +348,6 @@ GameObj.GameState = {
         }, this);
     },
     handleItemPickup: function(player, item) {
-        console.log('ITEM', item);
         switch (item.customData.type) {
             case 'healthPack':
                 this.restoreHealth();
@@ -477,7 +487,8 @@ GameObj.GameState = {
                 x: startingX,
                 y: this.getRandomInt(minY, maxY),
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
-                health: this.getRandomInt(minHealth, maxHealth),
+                health: 2,
+                // health: this.getRandomInt(minHealth, maxHealth),
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
                 powerUp: this.getRandomInt(300, 700)

@@ -9,8 +9,8 @@ GameObj.Enemy = function(game, x, y, data) {
     this.scale.setTo(-1, 1);
     this.customData = data;
     this.frame = Math.round(Math.random());
-    if(this.frame == 1){
-    	this.customData.speedX += (this.customData.speedX * 0.5);
+    if (this.frame == 1) {
+        this.customData.speedX += (this.customData.speedX * 0.5);
     }
 };
 
@@ -23,12 +23,16 @@ GameObj.Enemy.prototype.update = function() {
 
     var randomSpeed = getRandomSpeed();
 
-    if(this.position.y < GameObj.GameState.player.y) {
+    if (this.position.y < GameObj.GameState.player.y) {
         this.position.y += randomSpeed;
     }
 
-    if(this.position.y > GameObj.GameState.player.y) {
+    if (this.position.y > GameObj.GameState.player.y) {
         this.position.y -= randomSpeed;
+    }
+
+    if (this.customData.damaged) {
+        this.body.velocity.x = 0;
     }
 
     //kill if off screen and not already dead
@@ -40,7 +44,7 @@ GameObj.Enemy.prototype.update = function() {
     function getRandomSpeed() {
         var min = 0.2;
         var max = 0.9;
-        return Math.floor(Math.random()*(max-min+1)+min);
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 };
 
