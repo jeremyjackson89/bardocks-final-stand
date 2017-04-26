@@ -239,6 +239,9 @@ GameObj.GameState = {
     initializeEnergyBlasts: function() {
         this.energyBlasts = this.add.group();
         this.energyBlasts.enableBody = true;
+
+        this.enemyEnergyBlasts = this.add.group();
+        this.enemyEnergyBlasts.enableBody = true;
     },
     initializeEnemies: function() {
         this.enemies = this.add.group();
@@ -258,7 +261,7 @@ GameObj.GameState = {
     },
     createEnergyBlast: function() {
         var energyBlast = this.energyBlasts.getFirstExists(false);
-        var energyBlastX = this.player.x + 30;
+        var energyBlastX = this.player.x + 25;
         var energyBlastY = this.player.y;
         if (!energyBlast) {
             energyBlast = new GameObj.EnergyBlast(this.game, energyBlastX, energyBlastY);
@@ -489,6 +492,7 @@ GameObj.GameState = {
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
                 health: 2,
                 // health: this.getRandomInt(minHealth, maxHealth),
+                canUseEnergyBlast: Math.round(Math.random()),
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
                 powerUp: this.getRandomInt(300, 700)
