@@ -19,6 +19,7 @@ GameObj.PreloadState = {
     this.load.image('bardockFace', 'assets/images/sprites/bardock-face.png');
     this.load.image('dataPanel', 'assets/images/sprites/data-panel-2.png');
     this.load.image('energyBlast', 'assets/images/sprites/energy-blast.png');
+    this.load.image('enemyEnergyBlast', 'assets/images/sprites/enemy-energy-blast.png');
     this.load.image('energyBomb', 'assets/images/sprites/energy-bomb.png');
     this.load.image('infiniteBlast', 'assets/images/sprites/item-blast-infinite.png');
     this.load.image('largeBlast', 'assets/images/sprites/item-blast-large.png');
@@ -35,6 +36,7 @@ GameObj.PreloadState = {
 
      //sound effects
     this.load.audio('blast', ['assets/audio/blast.wav']);
+    this.load.audio('explosion', ['assets/audio/explosion.wav']);
     this.load.audio('noEnergy', ['assets/audio/no_energy.wav']);
     this.load.audio('hurt', ['assets/audio/hurt.wav']);
     this.load.audio('bardock_hurt', ['assets/audio/bardock_hurt.wav']);

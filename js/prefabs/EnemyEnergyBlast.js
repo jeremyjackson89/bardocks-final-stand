@@ -1,7 +1,7 @@
 var GameObj = GameObj || {};
 
 GameObj.EnemyEnergyBlast = function(game, x, y) {
-    Phaser.Sprite.call(this, game, x, y, 'energyBlast');
+    Phaser.Sprite.call(this, game, x, y, 'enemyEnergyBlast');
 
     //some default values
     this.anchor.setTo(0.5);

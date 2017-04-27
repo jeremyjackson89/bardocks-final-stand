@@ -54,9 +54,10 @@ GameObj.Enemy.prototype.reset = function(x, y, data) {
 };
 
 GameObj.Enemy.prototype.scheduleNextEnergyBlast = function() {
-    var randomTime = GameObj.GameState.getRandomInt(2000, 2500);
-    GameObj.game.time.events.add(randomTime, function() {
-        if (this.customData.damaged) {
+    var randomTime = GameObj.GameState.getRandomInt(600, 1500);
+    var timeBetweenBlasts = 777;
+    GameObj.game.time.events.add(timeBetweenBlasts, function() {
+        if (this.customData.damaged || this.position.x <= GameObj.game.world.width/2) {
             return this.scheduleNextEnergyBlast();
         }
         this.createEnergyBlast();
@@ -79,7 +80,7 @@ GameObj.Enemy.prototype.createEnergyBlast = function() {
         energyBlast.reset(energyBlastX, energyBlastY);
     }
     //set velocity
-    energyBlast.body.velocity.x = (this.customData.speedX * 1.5);
+    energyBlast.body.velocity.x = -(GameObj.GameState.ENERGY_BLAST_SPEED);
     GameObj.GameState.blastSound.play();
     GameObj.game.time.events.add(blastPoseTime, function() {
         this.frame = originalFrame;

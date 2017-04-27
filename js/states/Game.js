@@ -46,6 +46,9 @@ GameObj.GameState = {
         this.blastSound = this.add.audio('blast');
         this.blastSound.volume = 0.3;
 
+        this.explosionSound = this.add.audio('explosion');
+        this.explosionSound.volume = 0.3;
+
         this.noEnergySound = this.add.audio('noEnergy');
         this.noEnergySound.volume = 0.3;
 
@@ -85,6 +88,8 @@ GameObj.GameState = {
             this.game.physics.arcade.overlap(this.energyBlasts, this.enemies, this.blastEnemy, null, this);
             this.game.physics.arcade.overlap(this.player, this.enemies, this.handleAttack, null, this);
             this.game.physics.arcade.overlap(this.player, this.items, this.handleItemPickup, null, this);
+            this.game.physics.arcade.overlap(this.player, this.enemyEnergyBlasts, this.blastPlayer, null, this);
+            this.game.physics.arcade.overlap(this.energyBlasts, this.enemyEnergyBlasts, this.nullifyEnergyBlasts, null, this);
 
             //attacks
             if (this.elbowKey && this.elbowKey.downDuration(this.KEY_DOWN_DURATION)) {
@@ -296,6 +301,18 @@ GameObj.GameState = {
             item.reset(itemX, itemY, itemData);
         }
     },
+    blastPlayer: function(player, enemyEnergyBlast) {
+        if (!player.customData.damaged) {
+            this.handlePlayerDamage(player);
+        }
+    },
+    nullifyEnergyBlasts: function(energyBlast, enemyEnergyBlast) {
+        enemyEnergyBlast.kill();
+        this.explosionSound.play();
+        if(this.largeBlastsEnabled) return;
+        this.restoreEnegry();
+        energyBlast.kill();
+    },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
             var blastDamage = this.ATTACK_DAMAGE;
@@ -312,10 +329,7 @@ GameObj.GameState = {
         if (this.playerAttacking && !enemy.customData.damaged) {
             this.damageEnemy(enemy, 'attack', this.ATTACK_DAMAGE);
         } else if (enemyCanDamage && !player.customData.damaged && !enemy.customData.damaged) {
-            player.play('damaged');
             this.handlePlayerDamage(player);
-            player.customData.damaged = true;
-            this.bardockHurtSound.play();
         }
     },
     damageEnemy: function(enemy, damageType, damageAmount) {
@@ -430,6 +444,9 @@ GameObj.GameState = {
         }
     },
     handlePlayerDamage: function(player) {
+        player.play('damaged');
+        player.customData.damaged = true;
+        this.bardockHurtSound.play();
         var shakeIntensity = 0.02;
         var damageDuration = 250;
         var damage = 5;
@@ -468,6 +485,10 @@ GameObj.GameState = {
         this.scheduleNextItem();
     },
     generateEnemyData: function() {
+        var maxEnergyBlastingEnemies = this.currentLevel * 10;
+        var energyBlastingEnemies = 0;
+        var canUseEnergyBlast;
+
         var startingX = 10;
         var allowedTypes = this.currentLevelData.enemies;
         var maxIndex = allowedTypes.length - 1;
@@ -485,14 +506,21 @@ GameObj.GameState = {
         this.currentLevelData.enemies = [];
 
         for (var i = 0; i < enemiesToMake; i++) {
+            canUseEnergyBlast = 0;
+            if (energyBlastingEnemies < maxEnergyBlastingEnemies) {
+                canUseEnergyBlast = Math.round(Math.random());
+                if (canUseEnergyBlast) {
+                    energyBlastingEnemies++;
+                }
+            }
             var randomTypeIndex = this.getRandomInt(0, maxIndex);
+
             this.currentLevelData.enemies.push({
                 x: startingX,
                 y: this.getRandomInt(minY, maxY),
                 speedX: this.getRandomInt(minSpeed, maxSpeed),
-                health: 2,
-                // health: this.getRandomInt(minHealth, maxHealth),
-                canUseEnergyBlast: Math.round(Math.random()),
+                health: this.getRandomInt(minHealth, maxHealth),
+                canUseEnergyBlast: canUseEnergyBlast,
                 type: allowedTypes[randomTypeIndex],
                 time: this.getRandomInt(1, 2),
                 powerUp: this.getRandomInt(300, 700)
