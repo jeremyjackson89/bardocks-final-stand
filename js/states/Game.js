@@ -260,7 +260,10 @@ GameObj.GameState = {
         if (this.player.customData.energy < this.player.customData.maxEnergy) {
             var maxToRestore = Math.round(this.player.customData.maxEnergy / 10);
             var currentDifference = this.player.customData.maxEnergy - this.player.customData.energy;
-            var amountToRestore = (currentDifference == 1) ? 1 : maxToRestore;
+            var amountToRestore = maxToRestore;
+            if((this.player.customData.energy + amountToRestore) > this.player.customData.maxEnergy){
+                amountToRestore = currentDifference;
+            }
             this.player.customData.energy += amountToRestore;
         }
     },
@@ -309,9 +312,10 @@ GameObj.GameState = {
     nullifyEnergyBlasts: function(energyBlast, enemyEnergyBlast) {
         enemyEnergyBlast.kill();
         this.explosionSound.play();
-        if(this.largeBlastsEnabled) return;
         this.restoreEnegry();
-        energyBlast.kill();
+        if(!this.largeBlastsEnabled) {
+            energyBlast.kill();
+        }
     },
     blastEnemy: function(energyBlast, enemy) {
         if (!enemy.customData.damaged) {
@@ -345,10 +349,10 @@ GameObj.GameState = {
         enemy.customData.health -= damageAmount;
         this.hurtSound.play();
 
+        // this.knockbackEnemy(enemy);
         if (enemy.customData.health < 1) {
             return this.killEnemy(enemy);
         }
-        this.knockbackEnemy(enemy);
         this.scheduleEnemyRecovery(enemy, originalFrame);
     },
     knockbackEnemy: function(enemy) {
