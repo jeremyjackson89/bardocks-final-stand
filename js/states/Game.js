@@ -38,6 +38,9 @@ GameObj.GameState = {
             GameObj.game.paused = !GameObj.game.paused;
             if (GameObj.game.paused) {
                 this.pauseLabel.text = 'PAUSED';
+                this.atLeast9000Track.pause();
+            } else {
+                this.atLeast9000Track.resume();
             }
         }
     },
@@ -60,6 +63,13 @@ GameObj.GameState = {
 
         this.pickupSound = this.add.audio('pickup');
         this.pickupSound.volume = 0.3;
+
+        // music
+        if (!this.atLeast9000Track || !this.atLeast9000Track.isPlaying) {
+            this.atLeast9000Track = this.add.audio('atLeast9000Track');
+            this.atLeast9000Track.volume = 1;
+            this.atLeast9000Track.play();
+        }
 
         //background
         this.background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
@@ -261,7 +271,7 @@ GameObj.GameState = {
             var maxToRestore = Math.round(this.player.customData.maxEnergy / 10);
             var currentDifference = this.player.customData.maxEnergy - this.player.customData.energy;
             var amountToRestore = maxToRestore;
-            if((this.player.customData.energy + amountToRestore) > this.player.customData.maxEnergy){
+            if ((this.player.customData.energy + amountToRestore) > this.player.customData.maxEnergy) {
                 amountToRestore = currentDifference;
             }
             this.player.customData.energy += amountToRestore;
@@ -313,7 +323,7 @@ GameObj.GameState = {
         enemyEnergyBlast.kill();
         this.explosionSound.play();
         this.restoreEnegry();
-        if(!this.largeBlastsEnabled) {
+        if (!this.largeBlastsEnabled) {
             energyBlast.kill();
         }
     },
@@ -340,33 +350,27 @@ GameObj.GameState = {
         var originalFrame = enemy.frame;
         enemy.customData.damaged = true;
 
+        enemy.frame = 2;
         if (damageType == 'blast') {
             enemy.frame = 3;
-        } else {
-            enemy.frame = 2;
         }
 
         enemy.customData.health -= damageAmount;
         this.hurtSound.play();
-
-        // this.knockbackEnemy(enemy);
-        if (enemy.customData.health < 1) {
-            return this.killEnemy(enemy);
-        }
-        this.scheduleEnemyRecovery(enemy, originalFrame);
+        this.knockbackEnemy(enemy, originalFrame);
     },
-    knockbackEnemy: function(enemy) {
+    knockbackEnemy: function(enemy, originalFrame) {
         var knockbackTime = 250;
         var knockbackTween = this.game.add.tween(enemy);
         knockbackTween.to({ x: enemy.position.x + this.KNOCKBACK_DISTANCE }, knockbackTime);
-        knockbackTween.start();
-    },
-    scheduleEnemyRecovery: function(enemy, originalFrame) {
-        var damagedTime = 250;
-        this.game.time.events.add(damagedTime, function() {
+        knockbackTween.onComplete.add(function() {
+            if (enemy.customData.health < 1) {
+                return this.killEnemy(enemy);
+            }
             enemy.frame = originalFrame;
             enemy.customData.damaged = false;
         }, this);
+        knockbackTween.start();
     },
     handleItemPickup: function(player, item) {
         switch (item.customData.type) {
@@ -513,7 +517,7 @@ GameObj.GameState = {
             canUseEnergyBlast = 0;
             if (energyBlastingEnemies < maxEnergyBlastingEnemies) {
                 canUseEnergyBlast = Math.round(Math.random());
-                if (canUseEnergyBlast) {
+                if (canUseEnergyBlast > 0) {
                     energyBlastingEnemies++;
                 }
             }
@@ -552,6 +556,13 @@ GameObj.GameState = {
                 var minY = this.MIN_Y;
                 var maxY = this.game.world.height - 10;
                 var itemType = this.ITEMS[this.getRandomInt(0, 2)];
+
+                //help out the player a bit
+                var isLowOnHealth = (this.player.customData.health <= Math.round(this.player.customData.health/2));
+                if(isLowOnHealth) {
+                    itemType = "healthPack";
+                }
+
                 var minSpeed = this.currentLevelData.minSpeed;
                 var maxSpeed = this.currentLevelData.maxSpeed;
                 this.createItem({

@@ -6,7 +6,6 @@ GameObj.GameOverState = {
         this.playerData = playerData;
     },
     create: function() {
-        console.log('playerData', this.playerData);
         var background = this.add.tileSprite(0, 0, this.game.world.width, this.game.world.height, 'space');
         background.autoScroll(-30, 0);
 

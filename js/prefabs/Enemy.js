@@ -54,10 +54,9 @@ GameObj.Enemy.prototype.reset = function(x, y, data) {
 };
 
 GameObj.Enemy.prototype.scheduleNextEnergyBlast = function() {
-    var randomTime = GameObj.GameState.getRandomInt(600, 1500);
-    var timeBetweenBlasts = 777;
-    GameObj.game.time.events.add(timeBetweenBlasts, function() {
-        if (this.customData.damaged || this.position.x <= GameObj.game.world.width/2) {
+    var randomTime = GameObj.GameState.getRandomInt(500, 1500);
+    GameObj.game.time.events.add(randomTime, function() {
+        if (this.customData.damaged || this.position.x < (GameObj.game.world.width - GameObj.game.world.width/4)) {
             return this.scheduleNextEnergyBlast();
         }
         this.createEnergyBlast();
