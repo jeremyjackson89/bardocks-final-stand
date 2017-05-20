@@ -357,20 +357,17 @@ GameObj.GameState = {
 
         enemy.customData.health -= damageAmount;
         this.hurtSound.play();
-        this.knockbackEnemy(enemy, originalFrame);
+        if (enemy.customData.health < 1) {
+            return this.killEnemy(enemy);
+        }
+        this.scheduleEnemyRecovery(enemy, originalFrame);
     },
-    knockbackEnemy: function(enemy, originalFrame) {
-        var knockbackTime = 250;
-        var knockbackTween = this.game.add.tween(enemy);
-        knockbackTween.to({ x: enemy.position.x + this.KNOCKBACK_DISTANCE }, knockbackTime);
-        knockbackTween.onComplete.add(function() {
-            if (enemy.customData.health < 1) {
-                return this.killEnemy(enemy);
-            }
+    scheduleEnemyRecovery: function(enemy, originalFrame) {
+        var damagedTime = 250;
+        this.game.time.events.add(damagedTime, function() {
             enemy.frame = originalFrame;
             enemy.customData.damaged = false;
         }, this);
-        knockbackTween.start();
     },
     handleItemPickup: function(player, item) {
         switch (item.customData.type) {
