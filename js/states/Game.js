@@ -68,6 +68,7 @@ GameObj.GameState = {
         if (!this.atLeast9000Track || !this.atLeast9000Track.isPlaying) {
             this.atLeast9000Track = this.add.audio('atLeast9000Track');
             this.atLeast9000Track.volume = 1;
+            this.atLeast9000Track.loop = true;
             this.atLeast9000Track.play();
         }
 

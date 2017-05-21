@@ -30,7 +30,7 @@ GameObj.HomeState = {
         var createdByLabel = this.game.add.text(10, (this.game.world.height - 60), 'PROGRAMMING', startStyle);
         var creatorLabel = this.game.add.text(10, (this.game.world.height - 45), 'JEREMY JACKSON', creditStyle);
         var musicByLabel = this.game.add.text(10, (this.game.world.height - 30), 'MUSIC', startStyle);
-        var musicLabel = this.game.add.text(10, (this.game.world.height - 15), 'JAMIE OBESO', creditStyle);
+        var musicLabel = this.game.add.text(10, (this.game.world.height - 15), 'JAMIE OBESO - "AT LEAST 9000"', creditStyle);
 
         var controlStyle = { font: '7px PrStart', fill: '#fff' };
         this.game.add.text((this.game.world.width - 180), (this.game.world.height - 60), 'CONTROLS', startStyle);
